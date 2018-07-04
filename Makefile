@@ -17,14 +17,14 @@ else
 PLUGIN_VERSION ?= 0.9.$(shell date +%Y.%m.%d)
 endif
 
-CFLAGS	?= -O2 -g -pipe -Wall -DYAHOO_PLUGIN_VERSION='"$(PLUGIN_VERSION)"'
+CFLAGS	?= -O2 -g -pipe -Wall 
 LDFLAGS ?= -Wl,-z,relro
 
 # Do some nasty OS and purple version detection
 ifeq ($(OS),Windows_NT)
-  YAHOO_TARGET = libyahoo-plusplus.dll
-  YAHOO_DEST = "$(PROGRAMFILES)/Pidgin/plugins"
-  YAHOO_ICONS_DEST = "$(PROGRAMFILES)/Pidgin/pixmaps/pidgin/protocols"
+  SIGNAL_TARGET = signal_plugin.dll
+  SIGNAL_DEST = "$(PROGRAMFILES)/Pidgin/plugins"
+  SIGNAL_ICONS_DEST = "$(PROGRAMFILES)/Pidgin/pixmaps/pidgin/protocols"
 else
 
   UNAME_S := $(shell uname -s)
@@ -41,23 +41,23 @@ else
 
     CC = gcc
   else
-    CC ?= gcc
+	CC ?= gcc
   endif
 
   ifeq ($(shell $(PKG_CONFIG) --exists purple-3 2>/dev/null && echo "true"),)
     ifeq ($(shell $(PKG_CONFIG) --exists purple 2>/dev/null && echo "true"),)
-      YAHOO_TARGET = FAILNOPURPLE
-      YAHOO_DEST =
-	  YAHOO_ICONS_DEST =
+      SIGNAL_TARGET = FAILNOPURPLE
+      SIGNAL_DEST =
+	  SIGNAL_ICONS_DEST =
     else
-      YAHOO_TARGET = libyahoo-plusplus.so
-      YAHOO_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=plugindir purple`
-	  YAHOO_ICONS_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=datadir purple`/pixmaps/pidgin/protocols
+      SIGNAL_TARGET = signal.so
+      SIGNAL_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=plugindir purple`
+	  SIGNAL_ICONS_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=datadir purple`/pixmaps/pidgin/protocols
     endif
   else
-    YAHOO_TARGET = libyahoo-plusplus3.so
-    YAHOO_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=plugindir purple-3`
-	YAHOO_ICONS_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=datadir purple-3`/pixmaps/pidgin/protocols
+    SIGNAL_TARGET = signal3.so
+    SIGNAL_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=plugindir purple-3`
+	SIGNAL_ICONS_DEST = $(DESTDIR)`$(PKG_CONFIG) --variable=datadir purple-3`/pixmaps/pidgin/protocols
   endif
 endif
 
@@ -70,33 +70,33 @@ WIN32_PIDGIN3_LDFLAGS = -L$(PIDGIN3_TREE_TOP)/libpurple -L$(WIN32_DEV_TOP)/gplug
 
 C_FILES := 
 PURPLE_COMPAT_FILES := purple2compat/http.c purple2compat/purple-socket.c
-PURPLE_C_FILES := libyahoo-plusplus.c $(C_FILES)
+PURPLE_C_FILES := signal.c $(C_FILES)
 
 
 
 .PHONY:	all install FAILNOPURPLE clean
 
-all: $(YAHOO_TARGET)
+all: $(SIGNAL_TARGET)
 
-libyahoo-plusplus.so: $(PURPLE_C_FILES) $(PURPLE_COMPAT_FILES)
+signal.so: $(PURPLE_C_FILES) $(PURPLE_COMPAT_FILES)
 	$(CC) -fPIC $(CFLAGS) -shared -o $@ $^ $(LDFLAGS) `$(PKG_CONFIG) purple glib-2.0 json-glib-1.0 --libs --cflags`  $(INCLUDES) -Ipurple2compat -g -ggdb
 
-libyahoo-plusplus3.so: $(PURPLE_C_FILES)
+signal3.so: $(PURPLE_C_FILES)
 	$(CC) -fPIC $(CFLAGS) -shared -o $@ $^ $(LDFLAGS) `$(PKG_CONFIG) purple-3 glib-2.0 json-glib-1.0 --libs --cflags` $(INCLUDES)  -g -ggdb
 
-libyahoo-plusplus.dll: $(PURPLE_C_FILES) $(PURPLE_COMPAT_FILES)
+signal.dll: $(PURPLE_C_FILES) $(PURPLE_COMPAT_FILES)
 	$(WIN32_CC) -shared -o $@ $^ $(WIN32_PIDGIN2_CFLAGS) $(WIN32_PIDGIN2_LDFLAGS) -Ipurple2compat
 
-libyahoo-plusplus3.dll: $(PURPLE_C_FILES) $(PURPLE_COMPAT_FILES)
+signal3.dll: $(PURPLE_C_FILES) $(PURPLE_COMPAT_FILES)
 	$(WIN32_CC) -shared -o $@ $^ $(WIN32_PIDGIN3_CFLAGS) $(WIN32_PIDGIN3_LDFLAGS)
 
-install: $(YAHOO_TARGET) 
-	mkdir -p $(YAHOO_DEST)
-	install -p $(YAHOO_TARGET) $(YAHOO_DEST)
+install: $(SIGNAL_TARGET) 
+	mkdir -p $(SIGNAL_DEST)
+	install -p $(SIGNAL_TARGET) $(SIGNAL_DEST)
 
 FAILNOPURPLE:
 	echo "You need libpurple development headers installed to be able to compile this plugin"
 
 clean:
-	rm -f $(YAHOO_TARGET) 
+	rm -f $(SIGNAL_TARGET) 
 
