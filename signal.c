@@ -149,7 +149,7 @@ static const char *signal_list_icon(PurpleAccount *account, PurpleBuddy *buddy)
 	return "Signal";
 }
 
-static PurplePluginProtocolInfo *prple_info = {
+static PurplePluginProtocolInfo prple_info = {
 	
 	OPT_PROTO_MAIL_CHECK,
 	NULL,                   /* user_splits */
@@ -228,7 +228,7 @@ PurplePluginInfo info =
 PURPLE_PLUGIN_MAGIC,
 PURPLE_MAJOR_VERSION,
 PURPLE_MINOR_VERSION,
-PURPLE_PLUGIN_STANDARD,
+PURPLE_PLUGIN_PROTOCOL,
 NULL,
 0,
 NULL,
